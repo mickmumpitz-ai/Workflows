@@ -350,7 +350,7 @@ class BONE_TRACER_PT_panel(Panel):
         box.label(text="2. Enter Pose mode (for armatures)")
         box.label(text="3. Select bones to trace (if using armatures)")
         box.label(text="4. Active camera is used for tracing bones/ empties")
-        box.label(text="5. Override resolution above 720p for faster ComfyUI processing")
+        box.label(text="5. Reduce resolution to 720p or below for faster ComfyUI processing")
         box.label(text="6. Click Export")
         box.label(text="7. Open .txt file and copy content")
         
