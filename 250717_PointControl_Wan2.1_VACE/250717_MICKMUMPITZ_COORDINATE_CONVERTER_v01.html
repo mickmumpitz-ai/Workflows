@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resolution Coordinate Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .resolution-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .resolution-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .resolution-group:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.1);
+        }
+
+        .resolution-group h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-row label {
+            font-weight: 600;
+            color: #6c757d;
+            min-width: 30px;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-row input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .coordinate-section {
+            margin-bottom: 30px;
+        }
+
+        .coordinate-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .convert-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .clear-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .info-panel {
+            background: #e7f3ff;
+            border: 2px solid #b3d9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-panel h4 {
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 768px) {
+            .resolution-inputs {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Resolution Coordinate Converter</h1>
+        
+        <div class="info-panel">
+            <h4>How to use:</h4>
+            <p>1. Set your input and output resolutions<br>
+               2. Paste your coordinate array in JSON format (e.g., [{"x":100,"y":200}, {"x":150,"y":250}])<br>
+               3. Click "Convert Coordinates" to scale them to the new resolution</p>
+        </div>
+
+        <div class="resolution-inputs">
+            <div class="resolution-group">
+                <h3>📐 Input Resolution</h3>
+                <div class="input-row">
+                    <label>W:</label>
+                    <input type="number" id="inputWidth" value="3840" min="1" placeholder="Width">
+                    <label>H:</label>
+                    <input type="number" id="inputHeight" value="2160" min="1" placeholder="Height">
+                </div>
+            </div>
+            
+            <div class="resolution-group">
+                <h3>🎯 Output Resolution</h3>
+                <div class="input-row">
+                    <label>W:</label>
+                    <input type="number" id="outputWidth" value="1280" min="1" placeholder="Width">
+                    <label>H:</label>
+                    <input type="number" id="outputHeight" value="720" min="1" placeholder="Height">
+                </div>
+            </div>
+        </div>
+
+        <div class="stats" id="statsPanel" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-value" id="scaleX">1.00</div>
+                <div class="stat-label">X Scale Factor</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="scaleY">1.00</div>
+                <div class="stat-label">Y Scale Factor</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="pointCount">0</div>
+                <div class="stat-label">Coordinate Points</div>
+            </div>
+        </div>
+
+        <div class="coordinate-section">
+            <h3>📝 Input Coordinates</h3>
+            <textarea id="inputCoordinates" placeholder='Paste your coordinates here in JSON format, e.g.:
+[{"x":3154,"y":1552},{"x":3141,"y":1551},{"x":3127,"y":1550}]'></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="convert-btn" onclick="convertCoordinates()">🔄 Convert Coordinates</button>
+            <button class="clear-btn" onclick="clearAll()">🗑️ Clear All</button>
+        </div>
+
+        <div id="errorMessage"></div>
+
+        <div class="coordinate-section">
+            <h3>✨ Converted Coordinates</h3>
+            <textarea id="outputCoordinates" readonly placeholder="Converted coordinates will appear here..."></textarea>
+            <div class="button-group">
+                <button class="copy-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateStats() {
+            const inputWidth = parseFloat(document.getElementById('inputWidth').value) || 1;
+            const inputHeight = parseFloat(document.getElementById('inputHeight').value) || 1;
+            const outputWidth = parseFloat(document.getElementById('outputWidth').value) || 1;
+            const outputHeight = parseFloat(document.getElementById('outputHeight').value) || 1;
+            
+            const scaleX = outputWidth / inputWidth;
+            const scaleY = outputHeight / inputHeight;
+            
+            document.getElementById('scaleX').textContent = scaleX.toFixed(4);
+            document.getElementById('scaleY').textContent = scaleY.toFixed(4);
+            document.getElementById('statsPanel').style.display = 'grid';
+        }
+
+        function convertCoordinates() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = '';
+            
+            try {
+                // Get resolution values
+                const inputWidth = parseFloat(document.getElementById('inputWidth').value);
+                const inputHeight = parseFloat(document.getElementById('inputHeight').value);
+                const outputWidth = parseFloat(document.getElementById('outputWidth').value);
+                const outputHeight = parseFloat(document.getElementById('outputHeight').value);
+                
+                // Validate resolutions
+                if (!inputWidth || !inputHeight || !outputWidth || !outputHeight || 
+                    inputWidth <= 0 || inputHeight <= 0 || outputWidth <= 0 || outputHeight <= 0) {
+                    throw new Error('Please enter valid positive numbers for all resolution fields.');
+                }
+                
+                // Get and parse coordinates
+                const inputText = document.getElementById('inputCoordinates').value.trim();
+                if (!inputText) {
+                    throw new Error('Please enter coordinates to convert.');
+                }
+                
+                let coordinates;
+                try {
+                    coordinates = JSON.parse(inputText);
+                } catch (parseError) {
+                    throw new Error('Invalid JSON format. Please check your coordinate syntax.');
+                }
+                
+                if (!Array.isArray(coordinates)) {
+                    throw new Error('Coordinates must be an array.');
+                }
+                
+                // Handle nested arrays - flatten if needed
+                if (coordinates.length > 0 && Array.isArray(coordinates[0])) {
+                    // If first element is an array, assume it's nested like [[{x,y},...]]
+                    coordinates = coordinates[0];
+                    if (!Array.isArray(coordinates)) {
+                        throw new Error('Invalid nested array structure.');
+                    }
+                }
+                
+                if (coordinates.length === 0) {
+                    throw new Error('Coordinate array is empty.');
+                }
+                
+                // Validate coordinate format
+                for (let i = 0; i < coordinates.length; i++) {
+                    const coord = coordinates[i];
+                    if (!coord || typeof coord.x !== 'number' || typeof coord.y !== 'number') {
+                        throw new Error(`Invalid coordinate at index ${i}. Each coordinate must have 'x' and 'y' properties with numeric values.`);
+                    }
+                }
+                
+                // Calculate scaling factors
+                const scaleX = outputWidth / inputWidth;
+                const scaleY = outputHeight / inputHeight;
+                
+                // Convert coordinates
+                const convertedCoordinates = coordinates.map(coord => ({
+                    x: Math.round(coord.x * scaleX),
+                    y: Math.round(coord.y * scaleY)
+                }));
+                
+                // Output results
+                document.getElementById('outputCoordinates').value = JSON.stringify(convertedCoordinates, null, 2);
+                document.getElementById('pointCount').textContent = coordinates.length;
+                updateStats();
+                
+                // Success feedback
+                document.getElementById('outputCoordinates').style.borderColor = '#28a745';
+                setTimeout(() => {
+                    document.getElementById('outputCoordinates').style.borderColor = '#dee2e6';
+                }, 1000);
+                
+            } catch (error) {
+                errorDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                document.getElementById('outputCoordinates').value = '';
+            }
+        }
+        
+        function clearAll() {
+            document.getElementById('inputCoordinates').value = '';
+            document.getElementById('outputCoordinates').value = '';
+            document.getElementById('errorMessage').innerHTML = '';
+            document.getElementById('statsPanel').style.display = 'none';
+        }
+        
+        async function copyToClipboard() {
+            const outputText = document.getElementById('outputCoordinates').value;
+            if (!outputText) {
+                alert('No converted coordinates to copy!');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(outputText);
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ Copied!';
+                copyBtn.style.background = '#20c997';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '#28a745';
+                }, 1500);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = outputText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Coordinates copied to clipboard!');
+            }
+        }
+        
+        // Update stats when resolution values change
+        document.getElementById('inputWidth').addEventListener('input', updateStats);
+        document.getElementById('inputHeight').addEventListener('input', updateStats);
+        document.getElementById('outputWidth').addEventListener('input', updateStats);
+        document.getElementById('outputHeight').addEventListener('input', updateStats);
+        
+        // Initialize stats
+        updateStats();
+        
+        // Add keyboard shortcut for conversion
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                convertCoordinates();
+            }
+        });
+    </script>
+</body>
+</html>
